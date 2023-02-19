@@ -4,5 +4,7 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def index():
-    return 'TEST'
+def main():
+    return render_template(
+        'index.html'
+    )
