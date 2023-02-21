@@ -1,5 +1,6 @@
 from page_analyzer.validator import validate
 from psycopg2.extras import NamedTupleCursor
+from dotenv import load_dotenv
 import psycopg2
 import datetime
 import os
@@ -12,9 +13,10 @@ from flask import (
     url_for
 )
 
-
 app = Flask(__name__)
-app.secret_key = 'super secret key'
+
+load_dotenv()
+app.secret_key = os.urandom(12)
 
 database_url = os.getenv('DATABASE_URL')
 conn = psycopg2.connect(database_url)
@@ -27,7 +29,7 @@ def main_page():
     )
 
 
-@app.post('/urls')   # Button click
+@app.post('/urls')
 def add_urls():
     url = request.form.get('url')
     errors = validate(url)
@@ -37,38 +39,46 @@ def add_urls():
             errors=errors
         ), 422
 
+    url = re.match(r"^[a-z]+://([^/:]+)", url).group(0)
     with conn.cursor() as cursor:
-        current_date = datetime.datetime.now()
-        cursor.execute("INSERT INTO urls (name, created_at) VALUES (%(name)s, %(created_at)s);",
-                        {'name': url, 'created_at': current_date})
-        cursor.execute("SELECT id FROM urls WHERE name = %(name)s;", {'name': url})
+        try:
+            current_date = datetime.datetime.now()
+            cursor.execute("INSERT INTO urls (name, created_at)"
+                           "VALUES (%(name)s, %(created_at)s);",
+                           {'name': url, 'created_at': current_date})
+            flash('Страница успешно добавлена', 'success')
+            conn.commit()
+
+        except psycopg2.Error:
+            conn.rollback()
+            flash('Страница уже существует', 'info')
+
+        cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
+                       {'name': url})
         url_id = cursor.fetchone()[0]
-        flash('Страница успешно добавлена', 'alert-success')
-        return redirect(
-            url_for('url_page', id=url_id),
-        )
+
+    return redirect(url_for('url_page', id=url_id))
 
 
 @app.get('/urls/<int:id>')
 def url_page(id):
-    messages = get_flashed_messages()
+    messages = get_flashed_messages(with_categories=True)
     with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         url_data = cursor.fetchone()
 
     url, date = url_data.name, url_data.created_at.strftime('%Y-%m-%d')
-    domain = re.match(r"^[a-z]+://([^/:]+)", url).group(0)
 
     return render_template(
         'url_page.html',
         messages=messages,
         id=id,
-        url=domain,
+        url=url,
         date=date
     )
 
 
-@app.route('/urls', methods=['GET'])   # Header
+@app.route('/urls', methods=['GET'])
 def urls_list():
     with conn.cursor() as cursor:
         cursor.execute("SELECT * FROM urls ORDER BY created_at DESC;")

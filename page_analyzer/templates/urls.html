@@ -17,10 +17,10 @@
                         {% if urls %}
                             {% for url in urls %}
                                 <tr>
-                                    <th>{{ url[0] }}</th>
-                                    <th>{{ url[1] }}</th>
-                                    <th></th>
-                                    <th></th>
+                                    <td>{{ url[0] }}</td>
+                                    <td><a href="{{ url[1] }}">{{ url[1] }}</a></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
                             {% endfor %}
                         {% endif %}

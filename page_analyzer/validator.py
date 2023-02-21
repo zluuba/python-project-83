@@ -13,9 +13,9 @@ def validate(url):
         if not is_valid_url:
             raise Exception
     except:
-        flash('Некорректный URL', 'error')
+        flash('Некорректный URL', 'danger')
         if not url:
-            flash('URL обязателен', 'error')
-        errors = get_flashed_messages()
+            flash('URL обязателен', 'danger')
+        errors = get_flashed_messages(with_categories=True)
 
     return errors
