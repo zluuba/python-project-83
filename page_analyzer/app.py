@@ -30,7 +30,7 @@ def main_page():
 
 
 @app.post('/urls')
-def add_urls():
+def add_url():
     url = request.form.get('url')
     errors = validate(url)
     if errors:
@@ -39,7 +39,9 @@ def add_urls():
             errors=errors
         ), 422
 
+    url = url.strip()
     url = re.match(r"^[a-z]+://([^/:]+)", url).group(0)
+
     with conn.cursor() as cursor:
         try:
             current_date = datetime.datetime.now()
@@ -60,6 +62,17 @@ def add_urls():
     return redirect(url_for('url_page', id=url_id))
 
 
+@app.get('/urls')
+def urls_list():
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM urls ORDER BY created_at DESC;")
+        added_urls = cursor.fetchall()
+    return render_template(
+        'urls.html',
+        urls=added_urls,
+    )
+
+
 @app.get('/urls/<int:id>')
 def url_page(id):
     messages = get_flashed_messages(with_categories=True)
@@ -67,10 +80,12 @@ def url_page(id):
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         url_data = cursor.fetchone()
 
-    url, date = url_data.name, url_data.created_at.strftime('%Y-%m-%d')
+    if not url_data:
+        return render_template('not_found.html'), 404
 
+    url, date = url_data.name, url_data.created_at.strftime('%Y-%m-%d')
     return render_template(
-        'url_page.html',
+        'url.html',
         messages=messages,
         id=id,
         url=url,
@@ -78,12 +93,23 @@ def url_page(id):
     )
 
 
-@app.route('/urls', methods=['GET'])
-def urls_list():
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM urls ORDER BY created_at DESC;")
-        added_urls = cursor.fetchall()
-        return render_template(
-            'urls.html',
-            urls=added_urls,
-        )
+@app.post('/urls/<int:id>/checks')
+def checks(id):
+    # with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+    #     current_date = datetime.datetime.now()
+    #     cursor.execute("INSERT INTO url_checks (url_id, created_at)"
+    #                    "VALUES (%(url_id)s, %(created_at)s);",
+    #                    {'url_id': id, 'created_at': current_date})
+    #
+    #     cursor.execute("SELECT * FROM url_checks WHERE url_id = %s;",
+    #                    (id,))
+    #     check = cursor.fetchone()
+    #     flash('Страница успешно проверена', 'success')
+    #
+    #     # flash('Произошла ошибка при проверке', 'danger')
+    # return render_template(
+    #     'url.html',
+    #     checks=check,
+    #     id=id
+    # )
+    return url_page(id)
