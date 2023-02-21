@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS url_checks;
 
 CREATE TABLE urls (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    name VARCHAR(255),
+    name VARCHAR(255) UNIQUE,
     created_at TIMESTAMP NOT NULL
 );
 
