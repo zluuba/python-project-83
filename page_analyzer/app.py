@@ -15,13 +15,13 @@ from flask import (
     url_for
 )
 
-app = Flask(__name__)
 
 load_dotenv()
 
-app.config.update(
-    SECRET_KEY=os.getenv('SECRET_KEY')
-)
+app = Flask(__name__)
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+app.secret_key = SECRET_KEY
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 conn = psycopg2.connect(DATABASE_URL)
