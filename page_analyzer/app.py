@@ -15,13 +15,16 @@ from flask import (
     url_for
 )
 
-app = Flask(__name__)
 
 load_dotenv()
-app.secret_key = os.urandom(12)
 
-database_url = os.getenv('DATABASE_URL')
-conn = psycopg2.connect(database_url)
+app = Flask(__name__)
+app.config.update(
+    SECRET_KEY=os.getenv('SECRET_KEY')
+)
+
+DATABASE_URL = os.getenv('DATABASE_URL')
+conn = psycopg2.connect(DATABASE_URL)
 
 
 @app.route('/')
