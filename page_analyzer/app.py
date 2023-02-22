@@ -3,6 +3,7 @@ from psycopg2.extras import NamedTupleCursor
 from dotenv import load_dotenv
 import psycopg2
 import datetime
+import requests
 import os
 import re
 
@@ -45,11 +46,11 @@ def add_url():
     with conn.cursor() as cursor:
         try:
             current_date = datetime.datetime.now()
-            cursor.execute("INSERT INTO urls (name, created_at)"
+            cursor.execute("INSERT INTO urls (name, created_at) "
                            "VALUES (%(name)s, %(created_at)s);",
                            {'name': url, 'created_at': current_date})
-            flash('Страница успешно добавлена', 'success')
             conn.commit()
+            flash('Страница успешно добавлена', 'success')
 
         except psycopg2.Error:
             conn.rollback()
@@ -57,59 +58,70 @@ def add_url():
 
         cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
                        {'name': url})
-        url_id = cursor.fetchone()[0]
+        id = cursor.fetchone()[0]
 
-    return redirect(url_for('url_page', id=url_id))
+    return redirect(url_for('url_page', id=id))
 
 
 @app.get('/urls')
 def urls_list():
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM urls ORDER BY created_at DESC;")
-        added_urls = cursor.fetchall()
+    with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
+                       "urls.id, urls.name, url_checks.status_code "
+                       "FROM urls LEFT JOIN url_checks "
+                       "ON urls.id = url_checks.url_id "
+                       "GROUP BY urls.id, url_checks.status_code "
+                       "ORDER BY urls.id DESC;")
+        urls = cursor.fetchall()
+
     return render_template(
         'urls.html',
-        urls=added_urls,
+        urls=urls
     )
 
 
 @app.get('/urls/<int:id>')
 def url_page(id):
     messages = get_flashed_messages(with_categories=True)
+
     with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
-        url_data = cursor.fetchone()
+        data = cursor.fetchone()
 
-    if not url_data:
+        cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
+                       "ORDER BY created_at DESC;", (id,))
+        checks = cursor.fetchall()
+
+    if not data:
         return render_template('not_found.html'), 404
 
-    url, date = url_data.name, url_data.created_at.strftime('%Y-%m-%d')
     return render_template(
         'url.html',
         messages=messages,
-        id=id,
-        url=url,
-        date=date
+        data=data,
+        checks=checks
     )
 
 
 @app.post('/urls/<int:id>/checks')
-def checks(id):
-    # with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
-    #     current_date = datetime.datetime.now()
-    #     cursor.execute("INSERT INTO url_checks (url_id, created_at)"
-    #                    "VALUES (%(url_id)s, %(created_at)s);",
-    #                    {'url_id': id, 'created_at': current_date})
-    #
-    #     cursor.execute("SELECT * FROM url_checks WHERE url_id = %s;",
-    #                    (id,))
-    #     check = cursor.fetchone()
-    #     flash('Страница успешно проверена', 'success')
-    #
-    #     # flash('Произошла ошибка при проверке', 'danger')
-    # return render_template(
-    #     'url.html',
-    #     checks=check,
-    #     id=id
-    # )
-    return url_page(id)
+def check(id):
+    try:
+        with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+            cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
+            url = cursor.fetchone()
+            status_code = requests.get(url.name).status_code
+
+            current_date = datetime.datetime.now()
+            cursor.execute("INSERT INTO url_checks "
+                           "(url_id, status_code, created_at) "
+                           "VALUES (%(url_id)s, %(status_code)s, "
+                           "%(created_at)s);",
+                           {'url_id': id, 'status_code': status_code,
+                            'created_at': current_date})
+            conn.commit()
+            flash('Страница успешно проверена', 'success')
+
+    except requests.exceptions.ConnectionError:
+        flash('Произошла ошибка при проверке', 'danger')
+
+    return redirect(url_for('url_page', id=id))
