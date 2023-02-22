@@ -2,7 +2,6 @@ from page_analyzer.common import get_html_data
 from page_analyzer.validator import validate
 from psycopg2.extras import NamedTupleCursor
 from dotenv import load_dotenv
-from bs4 import BeautifulSoup
 import psycopg2
 import datetime
 import requests
