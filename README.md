@@ -3,7 +3,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/maintainability)](https://codeclimate.com/github/zluuba/python-project-83/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/test_coverage)](https://codeclimate.com/github/zluuba/python-project-83/test_coverage)
 
-https://python-project-83-production-07c5.up.railway.app/
+https://python-project-83-production-6275.up.railway.app/
 
 ## Page Analyzer
 Page Analyzer is a site that analyses specified pages for SEO-suitability (like [PageSpeed Insights](https://pagespeed.web.dev/)). <br>
