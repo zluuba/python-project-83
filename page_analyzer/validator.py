@@ -23,7 +23,7 @@ def validate(url):
             flash('URL обязателен', 'danger')
 
     except MaxLengthError:
-        flash('URL превышает 255 символов', 'danger')
+        flash(f'URL превышает {MAX_LENGTH} символов', 'danger')
 
     errors = get_flashed_messages(with_categories=True)
     return errors
