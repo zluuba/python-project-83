@@ -1,6 +1,7 @@
 from page_analyzer.validator import validate
 from psycopg2.extras import NamedTupleCursor
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 import psycopg2
 import datetime
 import requests
@@ -109,14 +110,25 @@ def check(id):
         with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
             cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
             url = cursor.fetchone()
-            status_code = requests.get(url.name).status_code
+            response = requests.get(url.name)
+            status_code = response.status_code
+
+            html = BeautifulSoup(response.content, 'html.parser')
+            h1 = html.h1.string if html.h1 else None
+            title = html.title.string if html.title else None
+            description = [tag.get('content') for tag in html.find_all('meta') if tag.get('name') == 'description']
+            description = description[0] if description else None
 
             current_date = datetime.datetime.now()
             cursor.execute("INSERT INTO url_checks "
-                           "(url_id, status_code, created_at) "
+                           "(url_id, status_code, h1, title, "
+                           "description, created_at) "
                            "VALUES (%(url_id)s, %(status_code)s, "
+                           "%(h1)s, %(title)s, %(description)s, "
                            "%(created_at)s);",
                            {'url_id': id, 'status_code': status_code,
+                            'h1': h1, 'title': title,
+                            'description': description,
                             'created_at': current_date})
             conn.commit()
             flash('Страница успешно проверена', 'success')
