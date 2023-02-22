@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          make install
+          make poetry-install
 #      - name: Install package
 #        run: |
 #          make build
