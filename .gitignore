@@ -1,8 +1,8 @@
 .venv/
 .idea/
 dist/
-.pytest_cache/
-__pycache__
-*.pyc
-.coverage
-coverage.xml
+#*.pyc
+#.coverage
+#coverage.xml
+
+.env
