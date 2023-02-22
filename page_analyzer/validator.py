@@ -1,21 +1,29 @@
 from urllib.parse import urlparse
 from flask import flash, get_flashed_messages
 
+MAX_LENGTH = 255
+
+
+class MaxLengthError(Exception):
+    """Raised when the URL have more than MAX_LENGTH characters"""
+    pass
+
 
 def validate(url):
-    errors = []
-
     try:
-        result = urlparse(url)
-        acceptable_length = 255
-        is_valid_url = all([result.scheme, result.netloc]) and \
-                       len(url) <= acceptable_length
-        if not is_valid_url:
-            raise Exception
-    except:
+        result, url_length = urlparse(url), len(url)
+        if not all([result.scheme, result.netloc]):
+            raise AttributeError
+        if url_length > MAX_LENGTH:
+            raise MaxLengthError
+
+    except AttributeError:
         flash('Некорректный URL', 'danger')
         if not url:
             flash('URL обязателен', 'danger')
-        errors = get_flashed_messages(with_categories=True)
 
+    except MaxLengthError:
+        flash('URL превышает 255 символов', 'danger')
+
+    errors = get_flashed_messages(with_categories=True)
     return errors
