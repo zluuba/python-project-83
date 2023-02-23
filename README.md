@@ -11,12 +11,11 @@ Page Analyzer is a site that analyses specified pages for SEO-suitability (like 
 
 ### Requirements
 
-- [postgresql](https://www.postgresql.org/download/)
 - [python](https://www.python.org/), version 3.9 or higher
 - [poetry](https://python-poetry.org/docs/#installation), version 1.0.0 or higher
 
 
-### Installation ([video](https://github.com/zluuba/python-project-83#package-setup))
+### Installation
 
 Clone this repo or download it with pip:
 ```ch
@@ -28,7 +27,7 @@ pip install --user git+https://github.com/zluuba/python-project-83.git
 
 Install package and dependencies:
 ```ch
-cd python-project-83
+cd python-project-83                # don't forget cd to downloaded package dir
 make install
 ```
 
@@ -56,7 +55,7 @@ SECRET_KEY = 'SecretKey'
 ```
 
 ### Now package ready to go
-Run WSGI HTTP server and follow the [link you will see](http://0.0.0.0:8000)
+Run WSGI HTTP server and follow the [link you will see](http://0.0.0.0:8000):
 ```ch
 make start
 ```
