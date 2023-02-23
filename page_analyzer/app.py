@@ -119,6 +119,9 @@ def check(id):
             url = cursor.fetchone()
             status_code, h1, title, description = get_html_data(url.name)
 
+            if status_code > 399:
+                raise ConnectionError
+
             current_date = datetime.datetime.now()
             cursor.execute("INSERT INTO url_checks "
                            "(url_id, status_code, h1, title, "
