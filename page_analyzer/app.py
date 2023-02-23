@@ -136,7 +136,7 @@ def check(id):
             conn.commit()
             flash('Страница успешно проверена', 'success')
 
-    except requests.exceptions.ConnectionError:
+    except (requests.exceptions.ConnectionError, ConnectionError):
         flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('url_page', id=id))
