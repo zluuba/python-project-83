@@ -46,7 +46,17 @@ createdb mydb
 psql mydb < database.sql
 ```
 
-##### Now package ready to go.
+### Create .env file
+```ch
+nano .env
+```
+And write down the following environment variables:
+```ch
+DATABASE_URL = 'postgres://<username>:<password>@<localhost>:<port>/mydb'
+SECRET_KEY = 'SecretKey'
+```
+
+### Now package ready to go
 Run WSGI HTTP server and follow the [link you will see](http://0.0.0.0:8000)
 ```ch
 make start
