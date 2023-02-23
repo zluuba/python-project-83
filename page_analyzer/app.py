@@ -6,7 +6,6 @@ import psycopg2
 import datetime
 import requests
 import os
-
 from flask import (
     Flask, render_template,
     request, redirect,
@@ -18,7 +17,6 @@ from flask import (
 load_dotenv()
 
 app = Flask(__name__)
-
 SECRET_KEY = os.getenv('SECRET_KEY')
 app.secret_key = SECRET_KEY
 

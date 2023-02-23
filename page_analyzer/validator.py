@@ -1,5 +1,5 @@
-from urllib.parse import urlparse
 from flask import flash, get_flashed_messages
+from urllib.parse import urlparse
 import re
 
 MAX_LENGTH = 255
