@@ -7,17 +7,16 @@
 [Link on Railway](https://python-project-83-production-6275.up.railway.app/)
 
 Page Analyzer is a site that analyses specified pages for SEO-suitability (like [PageSpeed Insights](https://pagespeed.web.dev/)). <br>
-**This is a study project**, so it will not be hosted, but you can use it by setting up a few things which will be described below.
+**This is a study project**, so it's not hosted (or hosted on Railway, if you see link above), but you can use it by setting up a few things which will be described below.
 
 ### Requirements
-Installed with one command.
 
 - [postgresql](https://www.postgresql.org/download/)
 - [python](https://www.python.org/), version 3.9 or higher
 - [poetry](https://python-poetry.org/docs/#installation), version 1.0.0 or higher
 
 
-### Installation
+### Installation ([video](https://github.com/zluuba/python-project-83#package-setup))
 
 Clone this repo or download it with pip:
 ```ch
@@ -27,17 +26,17 @@ git clone https://github.com/zluuba/python-project-83.git
 pip install --user git+https://github.com/zluuba/python-project-83.git
 ```
 
-Use these commands to install package and dependencies:
+Install package and dependencies:
 ```ch
 cd python-project-83
 make install
 ```
 
 ### Install Database (PostgreSQL)
-Use these commands or download it from [the official website](https://www.postgresql.org/download/)
+Use these commands or download DB from [official website](https://www.postgresql.org/download/):
 ```ch
 brew install postgresql             # MacOS
-sudo apt install postgresql         # Ubuntu, Windows
+sudo apt install postgresql         # Linux, Windows
 ```
 
 Create database and set schema:
@@ -50,7 +49,7 @@ psql mydb < database.sql
 ```ch
 nano .env
 ```
-And write down the following environment variables:
+And write down the following environment variables (paste your data):
 ```ch
 DATABASE_URL = 'postgres://<username>:<password>@<localhost>:<port>/mydb'
 SECRET_KEY = 'SecretKey'
