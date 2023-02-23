@@ -67,6 +67,14 @@ make dev
 ```
 
 
-### How it works. Video
+### Demos
 
---video--
+#### Package setup:
+
+https://user-images.githubusercontent.com/87614163/220867550-2d8e1f02-fc26-41b0-9406-3787a6632780.mp4
+
+
+#### Usage:
+
+https://user-images.githubusercontent.com/87614163/220869914-21c3617d-ef11-40eb-8cb3-842d5c057114.mp4
+
