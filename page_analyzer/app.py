@@ -6,7 +6,6 @@ import psycopg2
 import datetime
 import requests
 import os
-import re
 
 from flask import (
     Flask, render_template,
@@ -24,7 +23,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 app.secret_key = SECRET_KEY
 
 DATABASE_URL = os.getenv('DATABASE_URL')
-# conn = psycopg2.connect(DATABASE_URL)
+
 
 def connect_to_db():
     conn = psycopg2.connect(DATABASE_URL)
@@ -40,16 +39,13 @@ def main_page():
 
 @app.post('/urls')
 def add_url():
-    url = request.form.get('url')
-    errors = validate(url)
+    raw_url = request.form.get('url')
+    errors, url = validate(raw_url)
     if errors:
         return render_template(
             'index.html',
             errors=errors
         ), 422
-
-    url = url.strip()
-    url = re.match(r"^[a-z]+://([^/:]+)", url).group(0)
 
     conn = connect_to_db()
     with conn.cursor() as cursor:
