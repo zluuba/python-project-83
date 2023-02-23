@@ -21,14 +21,15 @@ Installed with one command.
 
 Clone this repo or download it with pip:
 ```ch
-git clone https://github.com/zluuba/difference-generator.git
+git clone https://github.com/zluuba/python-project-83.git
 ```
 ```ch
-pip install --user git+https://github.com/zluuba/difference-generator.git
+pip install --user git+https://github.com/zluuba/python-project-83.git
 ```
 
-Use these command to install package and dependencies:
+Use these commands to install package and dependencies:
 ```ch
+cd python-project-83
 make install
 ```
 
