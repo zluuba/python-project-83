@@ -5,23 +5,16 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Install dependencies
         run: |
           pip install poetry
           make install
-#      - name: Install package
-#        run: |
-#          make build
-#          make package-install
       - name: Run linter
         run: |
           pip install flake8
           make lint
-#        continue-on-error: true
 #      - name: Run pytest
 #        run: |
 #          pip install pytest
