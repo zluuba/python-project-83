@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 from flask import flash, get_flashed_messages
+import re
 
 MAX_LENGTH = 255
 
@@ -9,15 +10,25 @@ class MaxLengthError(Exception):
     pass
 
 
+class ValidationError(Exception):
+    """Raised when the URL isn't valid"""
+    pass
+
+
 def validate(url):
+    parse_url, url_length = urlparse(url), len(url)
+    scheme, netloc = parse_url.scheme, parse_url.netloc
+    valid_netloc = re.match(r"[a-zA-Z]+\.[a-zA-Z]+", netloc)
+
     try:
-        result, url_length = urlparse(url), len(url)
-        if not all([result.scheme, result.netloc]):
-            raise AttributeError
+        if scheme not in {'http', 'https'}:
+            raise ValidationError
+        if not netloc or not valid_netloc:
+            raise ValidationError
         if url_length > MAX_LENGTH:
             raise MaxLengthError
 
-    except AttributeError:
+    except ValidationError:
         flash('Некорректный URL', 'danger')
         if not url:
             flash('URL обязателен', 'danger')
@@ -26,4 +37,5 @@ def validate(url):
         flash(f'URL превышает {MAX_LENGTH} символов', 'danger')
 
     errors = get_flashed_messages(with_categories=True)
-    return errors
+    url = f'{scheme}://{netloc}'
+    return errors, url
