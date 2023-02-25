@@ -18,7 +18,7 @@ class ValidationError(Exception):
 def validate(url):
     parse_url, url_length = urlparse(url), len(url)
     scheme, netloc = parse_url.scheme, parse_url.netloc
-    valid_netloc = re.match(r"[a-zA-Z]+\.[a-zA-Z]+", netloc)
+    valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
 
     try:
         if scheme not in {'http', 'https'}:
