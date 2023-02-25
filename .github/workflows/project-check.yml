@@ -1,4 +1,4 @@
-name: project-check
+name: project-health
 
 on: [push]
 
