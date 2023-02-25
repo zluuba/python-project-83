@@ -6,7 +6,8 @@ import os
 
 
 def get_fixture_path(name):
-    return os.path.join('tests/fixtures/', name)
+    parent_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(parent_dir, 'fixtures/', name)
 
 
 def get_too_long_url(length):
