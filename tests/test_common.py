@@ -21,26 +21,14 @@ def test_get_valid_length_data(correct_html_data, too_long_data):
     assert valid_long_data[-3:] == HIDE_CHARS
 
 
-def test_fixtures():
-    """check Hexlet GitHub action fixtures path"""
-    url = 'https://check.org'
-    path = 'tests/fixtures/index.html'
-    h1 = 'Do not expect a miracle, miracles yourself!'
-    title = 'Test page'
-    description = 'Statements of great people'
-    with open(path, 'rb') as file:
-        responses.add(responses.GET, url, body=file, status=200)
-        assert get_html_data(url) == (200, h1, title, description)
+@responses.activate
+def test_get_html_data(url, status_codes, html_data):
+    file_path, h1, title, description = html_data
+    success, error = status_codes
 
+    with open(file_path, 'rb') as file:
+        responses.add(responses.GET, url, body=file, status=success)
+        assert get_html_data(url) == (success, h1, title, description)
 
-# @responses.activate
-# def test_get_html_data(url, status_codes, html_data):
-#     file_path, h1, title, description = html_data
-#     success, error = status_codes
-#
-#     with open(file_path, 'rb') as file:
-#         responses.add(responses.GET, url, body=file, status=success)
-#         assert get_html_data(url) == (success, h1, title, description)
-#
-#         responses.add(responses.GET, url, body=file, status=error)
-#         assert get_html_data(url) == (error, None, None, None)
+        responses.add(responses.GET, url, body=file, status=error)
+        assert get_html_data(url) == (error, None, None, None)
