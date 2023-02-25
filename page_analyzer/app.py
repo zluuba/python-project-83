@@ -24,8 +24,8 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 def connect_to_db():
-    conn = psycopg2.connect(DATABASE_URL)
-    return conn
+    connection = psycopg2.connect(DATABASE_URL)
+    return connection
 
 
 @app.route('/')
@@ -45,18 +45,18 @@ def add_url():
             errors=errors
         ), 422
 
-    conn = connect_to_db()
-    with conn.cursor() as cursor:
+    connection = connect_to_db()
+    with connection.cursor() as cursor:
         try:
             current_date = datetime.datetime.now()
             cursor.execute("INSERT INTO urls (name, created_at) "
                            "VALUES (%(name)s, %(created_at)s);",
                            {'name': url, 'created_at': current_date})
-            conn.commit()
+            connection.commit()
             flash('Страница успешно добавлена', 'success')
 
         except psycopg2.Error:
-            conn.rollback()
+            connection.rollback()
             flash('Страница уже существует', 'info')
 
         cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
@@ -68,8 +68,8 @@ def add_url():
 
 @app.get('/urls')
 def urls_list():
-    conn = connect_to_db()
-    with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+    connection = connect_to_db()
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
                        "FROM urls LEFT JOIN url_checks "
@@ -88,8 +88,8 @@ def urls_list():
 def url_page(id):
     messages = get_flashed_messages(with_categories=True)
 
-    conn = connect_to_db()
-    with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+    connection = connect_to_db()
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         data = cursor.fetchone()
 
@@ -111,8 +111,8 @@ def url_page(id):
 @app.post('/urls/<int:id>/checks')
 def check(id):
     try:
-        conn = connect_to_db()
-        with conn.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        connection = connect_to_db()
+        with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
             cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
             url = cursor.fetchone()
             status_code, h1, title, description = get_html_data(url.name)
@@ -131,7 +131,7 @@ def check(id):
                             'h1': h1, 'title': title,
                             'description': description,
                             'created_at': current_date})
-            conn.commit()
+            connection.commit()
             flash('Страница успешно проверена', 'success')
 
     except (requests.exceptions.ConnectionError, ConnectionError):
