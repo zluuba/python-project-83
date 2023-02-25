@@ -22,8 +22,8 @@ def test_get_valid_length_data(correct_html_data, too_long_data):
 
 
 @responses.activate
-def test_get_html_data(url, status_codes, html_data):
-    file_path, h1, title, description = html_data
+def test_get_html_data(url, status_codes, html_page_data):
+    file_path, h1, title, description = html_page_data
     success, error = status_codes
 
     with open(file_path, 'rb') as file:

@@ -71,7 +71,7 @@ def too_long_data():
 
 
 @pytest.fixture
-def html_data():
+def html_page_data():
     file_path = get_fixture_path('html_page.html')
     h1 = 'Some header'
     title = 'Some title'
