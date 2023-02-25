@@ -5,7 +5,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/maintainability)](https://codeclimate.com/github/zluuba/python-project-83/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/test_coverage)](https://codeclimate.com/github/zluuba/python-project-83/test_coverage)
 
-[Link on Railway](https://python-project-83-production-8361.up.railway.app/)
+[Link on Railway](https://python-project-83-production-6bdb.up.railway.app/)
 
 Page Analyzer is a site that analyses specified pages for SEO-suitability (like [PageSpeed Insights](https://pagespeed.web.dev/)). <br>
 **This is a study project**, so it's not hosted (or hosted on Railway, if you see link above), but you can use it by setting up a few things which will be described below.
