@@ -117,7 +117,7 @@ def check(id):
             url = cursor.fetchone()
             status_code, h1, title, description = get_html_data(url.name)
 
-            if status_code > 399:
+            if status_code < 100 or status_code > 400:
                 raise ConnectionError
 
             current_date = datetime.datetime.now()
