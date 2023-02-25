@@ -26,7 +26,7 @@ git clone https://github.com/zluuba/python-project-83.git
 pip install --user git+https://github.com/zluuba/python-project-83.git
 ```
 
-Install package and dependencies:
+Install dependencies:
 ```ch
 cd python-project-83                # don't forget cd to downloaded package dir
 make install
@@ -60,7 +60,7 @@ Run WSGI HTTP server and follow the [link you will see](http://0.0.0.0:8000):
 ```ch
 make start
 ```
-Or run locally:
+Or run locally with flask:
 ```ch
 make dev
 ```
