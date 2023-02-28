@@ -1,11 +1,10 @@
-from page_analyzer.common import get_html_data
 from page_analyzer.validator import validate
-from psycopg2.extras import NamedTupleCursor
 from dotenv import load_dotenv
-import psycopg2
-import datetime
-import requests
 import os
+from page_analyzer.database import (
+    add_url_to_db, get_urls_from_db,
+    get_url_from_db, add_check_to_db
+)
 from flask import (
     Flask, render_template,
     request, redirect,
@@ -13,19 +12,17 @@ from flask import (
     url_for
 )
 
-
 load_dotenv()
 
 app = Flask(__name__)
-SECRET_KEY = os.getenv('SECRET_KEY')
-app.secret_key = SECRET_KEY
 
+SECRET_KEY = os.getenv('SECRET_KEY')
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-
-def connect_to_db():
-    connection = psycopg2.connect(DATABASE_URL)
-    return connection
+app.config.update(
+    DATABASE_URL=DATABASE_URL,
+    SECRET_KEY=SECRET_KEY
+)
 
 
 @app.route('/')
@@ -45,38 +42,18 @@ def add_url():
             errors=errors
         ), 422
 
-    connection = connect_to_db()
-    with connection.cursor() as cursor:
-        try:
-            current_date = datetime.datetime.now()
-            cursor.execute("INSERT INTO urls (name, created_at) "
-                           "VALUES (%(name)s, %(created_at)s);",
-                           {'name': url, 'created_at': current_date})
-            connection.commit()
-            flash('Страница успешно добавлена', 'success')
-
-        except psycopg2.Error:
-            connection.rollback()
-            flash('Страница уже существует', 'info')
-
-        cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
-                       {'name': url})
-        id = cursor.fetchone()[0]
+    is_added, id = add_url_to_db(url)
+    if not is_added:
+        flash('Страница уже существует', 'info')
+    else:
+        flash('Страница успешно добавлена', 'success')
 
     return redirect(url_for('url_page', id=id))
 
 
 @app.get('/urls')
 def urls_list():
-    connection = connect_to_db()
-    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
-        cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
-                       "urls.id, urls.name, url_checks.status_code "
-                       "FROM urls LEFT JOIN url_checks "
-                       "ON urls.id = url_checks.url_id "
-                       "GROUP BY urls.id, url_checks.status_code "
-                       "ORDER BY urls.id DESC;")
-        urls = cursor.fetchall()
+    urls = get_urls_from_db()
 
     return render_template(
         'urls.html',
@@ -87,15 +64,7 @@ def urls_list():
 @app.get('/urls/<int:id>')
 def url_page(id):
     messages = get_flashed_messages(with_categories=True)
-
-    connection = connect_to_db()
-    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
-        cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
-        data = cursor.fetchone()
-
-        cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
-                       "ORDER BY created_at DESC;", (id,))
-        checks = cursor.fetchall()
+    data, checks = get_url_from_db(id)
 
     if not data:
         return render_template('not_found.html'), 404
@@ -110,31 +79,10 @@ def url_page(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    try:
-        connection = connect_to_db()
-        with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
-            cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
-            url = cursor.fetchone()
-            status_code, h1, title, description = get_html_data(url.name)
-
-            if status_code < 100 or status_code > 400:
-                raise ConnectionError
-
-            current_date = datetime.datetime.now()
-            cursor.execute("INSERT INTO url_checks "
-                           "(url_id, status_code, h1, title, "
-                           "description, created_at) "
-                           "VALUES (%(url_id)s, %(status_code)s, "
-                           "%(h1)s, %(title)s, %(description)s, "
-                           "%(created_at)s);",
-                           {'url_id': id, 'status_code': status_code,
-                            'h1': h1, 'title': title,
-                            'description': description,
-                            'created_at': current_date})
-            connection.commit()
-            flash('Страница успешно проверена', 'success')
-
-    except (requests.exceptions.ConnectionError, ConnectionError):
+    is_added = add_check_to_db(id)
+    if is_added:
+        flash('Страница успешно проверена', 'success')
+    else:
         flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('url_page', id=id))
