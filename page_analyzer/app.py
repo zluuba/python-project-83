@@ -1,6 +1,4 @@
 from page_analyzer.validator import validate
-from dotenv import load_dotenv
-import os
 from page_analyzer.database import (
     add_url_to_db, get_urls_from_db,
     get_url_from_db, add_check_to_db
@@ -11,6 +9,9 @@ from flask import (
     flash, get_flashed_messages,
     url_for
 )
+from dotenv import load_dotenv
+import os
+
 
 load_dotenv()
 
@@ -32,6 +33,15 @@ def main_page():
     )
 
 
+@app.get('/urls')
+def urls_list():
+    urls = get_urls_from_db()
+    return render_template(
+        'urls.html',
+        urls=urls
+    )
+
+
 @app.post('/urls')
 def add_url():
     raw_url = request.form.get('url')
@@ -40,25 +50,15 @@ def add_url():
         return render_template(
             'index.html',
             errors=errors
-        ), 422
+        ), 400
 
     is_added, id = add_url_to_db(url)
-    if not is_added:
-        flash('Страница уже существует', 'info')
-    else:
+    if is_added:
         flash('Страница успешно добавлена', 'success')
+    else:
+        flash('Страница уже существует', 'info')
 
     return redirect(url_for('url_page', id=id))
-
-
-@app.get('/urls')
-def urls_list():
-    urls = get_urls_from_db()
-
-    return render_template(
-        'urls.html',
-        urls=urls
-    )
 
 
 @app.get('/urls/<int:id>')
