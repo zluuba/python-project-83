@@ -23,7 +23,7 @@ def test_get_valid_length_data(correct_html_data, too_long_data):
 
 
 @responses.activate
-def test_get_html_data(url, html_page_data):
+def test_get_parse_data(url, html_page_data):
     file_path, h1, title, description = html_page_data
 
     with open(file_path, 'rb') as file:
