@@ -21,9 +21,7 @@ def validate(url):
     valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
 
     try:
-        if scheme not in {'http', 'https'}:
-            raise ValidationError
-        if not netloc or not valid_netloc:
+        if scheme not in {'http', 'https'} or not valid_netloc:
             raise ValidationError
         if url_length > MAX_LENGTH:
             raise MaxLengthError
