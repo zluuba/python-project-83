@@ -50,7 +50,7 @@ def add_url():
         return render_template(
             'index.html',
             errors=errors
-        ), 400
+        ), 422
 
     is_added, id = add_url_to_db(url)
     if is_added:
