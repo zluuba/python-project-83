@@ -1,5 +1,5 @@
+from page_analyzer.parser import get_parse_data
 from psycopg2.extras import NamedTupleCursor
-from page_analyzer.common import get_html_data
 import psycopg2
 import datetime
 import requests
@@ -26,8 +26,10 @@ def add_url_to_db(url):
             connection.rollback()
             is_added = False
 
-        cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
-                       {'name': url})
+        cursor.execute(
+            "SELECT id FROM urls WHERE name = %(name)s;",
+            {'name': url}
+        )
         id = cursor.fetchone()[0]
 
     return is_added, id
@@ -61,15 +63,18 @@ def get_url_from_db(id):
 
 
 def add_check_to_db(id):
-    try:
-        connection = connect_to_db()
-        with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+    connection = connect_to_db()
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        try:
             cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
             url = cursor.fetchone()
-            status_code, h1, title, description = get_html_data(url.name)
+            response = requests.get(url.name, timeout=10)
+            status_code = response.status_code
 
             if status_code < 100 or status_code > 400:
                 raise ConnectionError
+
+            data = get_parse_data(response.content)
 
             current_date = datetime.datetime.now()
             cursor.execute("INSERT INTO url_checks "
@@ -79,11 +84,15 @@ def add_check_to_db(id):
                            "%(h1)s, %(title)s, %(description)s, "
                            "%(created_at)s);",
                            {'url_id': id, 'status_code': status_code,
-                            'h1': h1, 'title': title,
-                            'description': description,
+                            'h1': data['h1'], 'title': data['title'],
+                            'description': data['description'],
                             'created_at': current_date})
             connection.commit()
             return True
 
-    except (requests.exceptions.ConnectionError, ConnectionError):
-        return False
+        except requests.exceptions.ConnectionError:
+            connection.rollback()
+            return False
+
+        except ConnectionError:
+            return False
