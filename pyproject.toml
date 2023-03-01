@@ -5,14 +5,13 @@ description = "Page Analyzer. Specified pages analysis for SEO-suitability"
 license = "Proprietary"
 authors = ["zluuba <zluyba.nikitina@gmail.com>"]
 readme = "README.md"
-repository = "https://github.com/zluuba/python-project-83"
+repository = "https://github.com/zluuba/page-analyzer"
 packages = [{include = "page_analyzer"}]
 classifiers = [
     "Environment :: Web Environment",
+    "Programming Language :: Python",
     "Natural Language :: Russian",
     "Framework :: Flask",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Topic :: Internet"
 ]
 

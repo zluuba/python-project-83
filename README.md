@@ -21,15 +21,15 @@ Page Analyzer is a site that analyses specified pages for SEO-suitability (like 
 
 Clone this repo or download it with pip:
 ```ch
-git clone https://github.com/zluuba/python-project-83.git
+git clone https://github.com/zluuba/page-analyzer.git
 ```
 ```ch
-pip install --user git+https://github.com/zluuba/python-project-83.git
+pip install --user git+https://github.com/zluuba/page-analyzer.git
 ```
 
 Install dependencies:
 ```ch
-cd python-project-83                # don't forget cd to downloaded package dir
+cd page-analyzer                # don't forget cd to downloaded package dir
 make install
 ```
 
