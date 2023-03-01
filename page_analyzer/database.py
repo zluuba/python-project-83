@@ -62,7 +62,7 @@ def get_url_from_db(id):
     return data, checks
 
 
-def add_check_to_db(id):
+def add_url_check_to_db(id):
     connection = connect_to_db()
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         try:

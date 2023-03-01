@@ -1,7 +1,7 @@
 from page_analyzer.validator import validate
 from page_analyzer.database import (
     add_url_to_db, get_urls_from_db,
-    get_url_from_db, add_check_to_db
+    get_url_from_db, add_url_check_to_db
 )
 from flask import (
     Flask, render_template,
@@ -79,7 +79,7 @@ def url_page(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    is_added = add_check_to_db(id)
+    is_added = add_url_check_to_db(id)
     if is_added:
         flash('Страница успешно проверена', 'success')
     else:

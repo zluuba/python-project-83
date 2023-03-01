@@ -53,8 +53,7 @@ def correct_html_data():
     h1 = 'headline'
     title = 'some correct title'
     description = 'not too long correct description'
-    empty_data = None
-    return h1, title, description, empty_data
+    return h1, title, description
 
 
 @pytest.fixture
@@ -76,16 +75,9 @@ def html_page_data():
     h1 = 'Some header'
     title = 'Some title'
     description = 'Some description'
-    return file_path, h1, title, description
+    return file_path, dict(h1=h1, title=title, description=description)
 
 
 @pytest.fixture
 def url():
     return 'http://test.com/'
-
-
-@pytest.fixture
-def status_codes():
-    success = 200
-    error = 404
-    return success, error

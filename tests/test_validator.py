@@ -4,7 +4,6 @@ from flask import Flask
 
 app = Flask(__name__)
 app.testing = True
-client = app.test_client()
 app.secret_key = 'test-key'
 
 

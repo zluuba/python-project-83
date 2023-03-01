@@ -13,8 +13,8 @@ def get_valid_length_data(data):
     return data
 
 
-def get_parse_data(content):
-    html = BeautifulSoup(content, 'html.parser')
+def get_parse_data(page_content):
+    html = BeautifulSoup(page_content, 'html.parser')
     parse_data = dict(h1=None, title=None, description=None)
 
     description = [
