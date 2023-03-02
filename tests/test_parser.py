@@ -1,4 +1,6 @@
-from page_analyzer.parser import get_valid_length_data, get_response, get_parse_data
+from page_analyzer.parser import (
+    get_valid_length_data, get_response, get_parse_data
+)
 from page_analyzer.validator import MAX_LENGTH
 import responses
 import requests
