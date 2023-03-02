@@ -1,18 +1,15 @@
 from psycopg2.extras import NamedTupleCursor
-from dotenv import load_dotenv
 import psycopg2
 import datetime
 import os
 
 
-load_dotenv()
-DATABASE_URL = os.getenv('DATABASE_URL')
-
 DATE = datetime.datetime.now()
 
 
 def connect():
-    return psycopg2.connect(DATABASE_URL)
+    connection = psycopg2.connect(os.getenv('DATABASE_URL'))
+    return connection
 
 
 def get_data_from_id(id, connection=connect()):
