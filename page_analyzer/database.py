@@ -2,30 +2,26 @@ from psycopg2.extras import NamedTupleCursor
 from dotenv import load_dotenv
 import psycopg2
 import datetime
-import os
 
 
 load_dotenv()
 
 DATE = datetime.datetime.now()
-DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-def connect():
-    connection = psycopg2.connect(DATABASE_URL)
-    return connection
+def connect(app):
+    db_url = app.config['DATABASE_URL']
+    return psycopg2.connect(db_url)
 
 
-def get_data_from_id(id):
-    connection = connect()
+def get_data_from_id(id, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         data = cursor.fetchone()
     return data
 
 
-def get_urls_from_db():
-    connection = connect()
+def get_urls_from_db(connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
@@ -38,19 +34,17 @@ def get_urls_from_db():
     return urls
 
 
-def get_url_from_db(id):
-    connection = connect()
+def get_url_from_db(id, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
                        "ORDER BY created_at DESC;", (id,))
         checks = cursor.fetchall()
 
-    data = get_data_from_id(id)
+    data = get_data_from_id(id, connection)
     return data, checks
 
 
-def add_url_check_to_db(id, data):
-    connection = connect()
+def add_url_check_to_db(id, data, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("INSERT INTO url_checks "
                        "(url_id, status_code, h1, title, "
@@ -65,8 +59,7 @@ def add_url_check_to_db(id, data):
         connection.commit()
 
 
-def add_url_to_db(url):
-    connection = connect()
+def add_url_to_db(url, connection):
     with connection.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO urls (name, created_at) "
