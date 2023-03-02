@@ -7,19 +7,22 @@ import os
 
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
-connection_to_db = psycopg2.connect(DATABASE_URL)
 
 DATE = datetime.datetime.now()
 
 
-def get_data_from_id(id, connection=connection_to_db):
+def connect():
+    return psycopg2.connect(DATABASE_URL)
+
+
+def get_data_from_id(id, connection=connect()):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         data = cursor.fetchone()
     return data
 
 
-def get_urls_from_db(connection=connection_to_db):
+def get_urls_from_db(connection=connect()):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
@@ -32,7 +35,7 @@ def get_urls_from_db(connection=connection_to_db):
     return urls
 
 
-def get_url_from_db(id, connection=connection_to_db):
+def get_url_from_db(id, connection=connect()):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
                        "ORDER BY created_at DESC;", (id,))
@@ -42,7 +45,7 @@ def get_url_from_db(id, connection=connection_to_db):
     return data, checks
 
 
-def add_url_check_to_db(id, data, connection=connection_to_db):
+def add_url_check_to_db(id, data, connection=connect()):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("INSERT INTO url_checks "
                        "(url_id, status_code, h1, title, "
@@ -57,7 +60,7 @@ def add_url_check_to_db(id, data, connection=connection_to_db):
         connection.commit()
 
 
-def add_url_to_db(url, connection=connection_to_db):
+def add_url_to_db(url, connection=connect()):
     with connection.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO urls (name, created_at) "
