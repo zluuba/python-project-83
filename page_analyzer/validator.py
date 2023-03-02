@@ -15,15 +15,25 @@ class ValidationError(Exception):
     pass
 
 
-def validate(url):
-    parse_url, url_length = urlparse(url), len(url)
+def get_url_parts(url):
+    parse_url = urlparse(url)
     scheme, netloc = parse_url.scheme, parse_url.netloc
+    return scheme, netloc
+
+
+def get_normalized_url(url):
+    scheme, netloc = get_url_parts(url)
+    return f'{scheme}://{netloc}'
+
+
+def validate(url):
+    scheme, netloc = get_url_parts(url)
     valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
 
     try:
         if scheme not in {'http', 'https'} or not valid_netloc:
             raise ValidationError
-        if url_length > MAX_LENGTH:
+        if len(url) > MAX_LENGTH:
             raise MaxLengthError
 
     except ValidationError:
@@ -34,6 +44,4 @@ def validate(url):
     except MaxLengthError:
         flash(f'URL превышает {MAX_LENGTH} символов', 'danger')
 
-    errors = get_flashed_messages(with_categories=True)
-    url = f'{scheme}://{netloc}'
-    return errors, url
+    return get_flashed_messages(with_categories=True)

@@ -1,42 +1,22 @@
-from page_analyzer.parser import get_parse_data
 from psycopg2.extras import NamedTupleCursor
 import psycopg2
 import datetime
-import requests
 import os
 
 
-def connect_to_db():
-    connection = psycopg2.connect(os.getenv('DATABASE_URL'))
-    return connection
+DATABASE_URL = os.getenv('DATABASE_URL')
+connection_to_db = psycopg2.connect(DATABASE_URL)
+DATE = datetime.datetime.now()
 
 
-def add_url_to_db(url):
-    connection = connect_to_db()
-    with connection.cursor() as cursor:
-        try:
-            current_date = datetime.datetime.now()
-            cursor.execute("INSERT INTO urls (name, created_at) "
-                           "VALUES (%(name)s, %(created_at)s);",
-                           {'name': url, 'created_at': current_date})
-            connection.commit()
-            is_added = True
-
-        except psycopg2.Error:
-            connection.rollback()
-            is_added = False
-
-        cursor.execute(
-            "SELECT id FROM urls WHERE name = %(name)s;",
-            {'name': url}
-        )
-        id = cursor.fetchone()[0]
-
-    return is_added, id
+def get_data_from_id(id, connection=connection_to_db):
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
+        data = cursor.fetchone()
+    return data
 
 
-def get_urls_from_db():
-    connection = connect_to_db()
+def get_urls_from_db(connection=connection_to_db):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
@@ -49,50 +29,46 @@ def get_urls_from_db():
     return urls
 
 
-def get_url_from_db(id):
-    connection = connect_to_db()
+def get_url_from_db(id, connection=connection_to_db):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
-        cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
-        data = cursor.fetchone()
-
         cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
                        "ORDER BY created_at DESC;", (id,))
         checks = cursor.fetchall()
 
+    data = get_data_from_id(id)
     return data, checks
 
 
-def add_url_check_to_db(id):
-    connection = connect_to_db()
+def add_url_check_to_db(id, data, connection=connection_to_db):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        cursor.execute("INSERT INTO url_checks "
+                       "(url_id, status_code, h1, title, "
+                       "description, created_at) "
+                       "VALUES (%(url_id)s, %(status_code)s, "
+                       "%(h1)s, %(title)s, %(description)s, "
+                       "%(created_at)s);",
+                       {'url_id': id, 'status_code': data['status_code'],
+                        'h1': data['h1'], 'title': data['title'],
+                        'description': data['description'],
+                        'created_at': DATE})
+        connection.commit()
+
+
+def add_url_to_db(url, connection=connection_to_db):
+    with connection.cursor() as cursor:
         try:
-            cursor.execute("SELECT name FROM urls WHERE id = %s;", (id,))
-            url = cursor.fetchone()
-            response = requests.get(url.name, timeout=10)
-            status_code = response.status_code
-
-            if status_code < 100 or status_code > 400:
-                raise ConnectionError
-
-            data = get_parse_data(response.content)
-
-            current_date = datetime.datetime.now()
-            cursor.execute("INSERT INTO url_checks "
-                           "(url_id, status_code, h1, title, "
-                           "description, created_at) "
-                           "VALUES (%(url_id)s, %(status_code)s, "
-                           "%(h1)s, %(title)s, %(description)s, "
-                           "%(created_at)s);",
-                           {'url_id': id, 'status_code': status_code,
-                            'h1': data['h1'], 'title': data['title'],
-                            'description': data['description'],
-                            'created_at': current_date})
+            cursor.execute("INSERT INTO urls (name, created_at) "
+                           "VALUES (%(name)s, %(created_at)s);",
+                           {'name': url, 'created_at': DATE})
             connection.commit()
-            return True
+            is_added = True
 
-        except requests.exceptions.ConnectionError:
+        except psycopg2.Error:
             connection.rollback()
-            return False
+            is_added = False
 
-        except ConnectionError:
-            return False
+        cursor.execute("SELECT id FROM urls WHERE name = %(name)s;",
+                       {'name': url})
+        id = cursor.fetchone()[0]
+
+    return is_added, id

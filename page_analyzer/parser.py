@@ -1,5 +1,6 @@
 from page_analyzer.validator import MAX_LENGTH
 from bs4 import BeautifulSoup
+import requests
 
 
 HIDE_CHARS = '...'
@@ -13,9 +14,22 @@ def get_valid_length_data(data):
     return data
 
 
-def get_parse_data(page_content):
-    html = BeautifulSoup(page_content, 'html.parser')
+def get_response(url):
+    try:
+        response = requests.get(url, timeout=10)
+        status_code = response.status_code
+        if status_code < 100 or status_code > 400:
+            raise ConnectionError
+    except (requests.exceptions.ConnectionError, ConnectionError):
+        return None
+    return response
+
+
+def get_parse_data(response):
     parse_data = dict(h1=None, title=None, description=None)
+
+    parse_data['status_code'] = response.status_code
+    html = BeautifulSoup(response.content, 'html.parser')
 
     description = [
         tag.get('content') for tag in html.find_all('meta') if

@@ -1,13 +1,12 @@
-from page_analyzer.validator import validate
+from page_analyzer.validator import validate, get_normalized_url
+from page_analyzer.parser import get_response, get_parse_data
 from page_analyzer.database import (
-    add_url_to_db, get_urls_from_db,
-    get_url_from_db, add_url_check_to_db
+    add_url_to_db, get_urls_from_db, get_data_from_id,
+    get_url_from_db, add_url_check_to_db,
 )
 from flask import (
-    Flask, render_template,
-    request, redirect,
-    flash, get_flashed_messages,
-    url_for
+    Flask, render_template, request, redirect,
+    flash, get_flashed_messages, url_for
 )
 from dotenv import load_dotenv
 import os
@@ -18,12 +17,7 @@ load_dotenv()
 app = Flask(__name__)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-app.config.update(
-    DATABASE_URL=DATABASE_URL,
-    SECRET_KEY=SECRET_KEY
-)
+app.config.update(SECRET_KEY=SECRET_KEY)
 
 
 @app.route('/')
@@ -44,14 +38,15 @@ def urls_list():
 
 @app.post('/urls')
 def add_url():
-    raw_url = request.form.get('url')
-    errors, url = validate(raw_url)
+    url = request.form.get('url')
+    errors = validate(url)
     if errors:
         return render_template(
             'index.html',
             errors=errors
         ), 422
 
+    url = get_normalized_url(url)
     is_added, id = add_url_to_db(url)
     if is_added:
         flash('Страница успешно добавлена', 'success')
@@ -63,12 +58,11 @@ def add_url():
 
 @app.get('/urls/<int:id>')
 def url_page(id):
-    messages = get_flashed_messages(with_categories=True)
     data, checks = get_url_from_db(id)
-
     if not data:
-        return render_template('not_found.html'), 404
+        return not_found()
 
+    messages = get_flashed_messages(with_categories=True)
     return render_template(
         'url.html',
         messages=messages,
@@ -79,10 +73,19 @@ def url_page(id):
 
 @app.post('/urls/<int:id>/checks')
 def check(id):
-    is_added = add_url_check_to_db(id)
-    if is_added:
+    url = get_data_from_id(id).name
+    response = get_response(url)
+    if response:
+        data = get_parse_data(response)
+        add_url_check_to_db(id, data)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
 
     return redirect(url_for('url_page', id=id))
+
+
+def not_found():
+    return render_template(
+        'not_found.html'
+    ), 404
