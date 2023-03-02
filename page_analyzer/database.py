@@ -1,11 +1,14 @@
 from psycopg2.extras import NamedTupleCursor
+from dotenv import dotenv_values
 import psycopg2
 import datetime
-import os
 
 
-DATABASE_URL = os.getenv('DATABASE_URL')
-connection_to_db = psycopg2.connect(DATABASE_URL)
+config = dotenv_values(".env")
+db_url = config['DATABASE_URL']
+
+connection_to_db = psycopg2.connect(db_url)
+
 DATE = datetime.datetime.now()
 
 

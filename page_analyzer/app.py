@@ -6,7 +6,7 @@ from page_analyzer.database import (
 )
 from flask import (
     Flask, render_template, request, redirect,
-    flash, get_flashed_messages, url_for
+    flash, get_flashed_messages, url_for, abort
 )
 from dotenv import load_dotenv
 import os
@@ -60,7 +60,7 @@ def add_url():
 def url_page(id):
     data, checks = get_url_from_db(id)
     if not data:
-        return not_found()
+        return abort(404)
 
     messages = get_flashed_messages(with_categories=True)
     return render_template(
@@ -85,7 +85,15 @@ def check(id):
     return redirect(url_for('url_page', id=id))
 
 
-def not_found():
+@app.errorhandler(404)
+def page_not_found(error):
     return render_template(
-        'not_found.html'
+        'page_not_found.html'
     ), 404
+
+
+@app.errorhandler(500)
+def internal_server_error():
+    return render_template(
+        'internal_server_error.html'
+    ), 500
