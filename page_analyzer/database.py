@@ -12,14 +12,16 @@ def connect():
     return connection
 
 
-def get_data_from_id(id, connection=connect()):
+def get_data_from_id(id):
+    connection = connect()
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
         data = cursor.fetchone()
     return data
 
 
-def get_urls_from_db(connection=connect()):
+def get_urls_from_db():
+    connection = connect()
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT MAX(url_checks.created_at) AS created_at, "
                        "urls.id, urls.name, url_checks.status_code "
@@ -32,7 +34,8 @@ def get_urls_from_db(connection=connect()):
     return urls
 
 
-def get_url_from_db(id, connection=connect()):
+def get_url_from_db(id):
+    connection = connect()
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM url_checks WHERE url_id = %s "
                        "ORDER BY created_at DESC;", (id,))
@@ -42,7 +45,8 @@ def get_url_from_db(id, connection=connect()):
     return data, checks
 
 
-def add_url_check_to_db(id, data, connection=connect()):
+def add_url_check_to_db(id, data):
+    connection = connect()
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("INSERT INTO url_checks "
                        "(url_id, status_code, h1, title, "
@@ -57,7 +61,8 @@ def add_url_check_to_db(id, data, connection=connect()):
         connection.commit()
 
 
-def add_url_to_db(url, connection=connect()):
+def add_url_to_db(url):
+    connection = connect()
     with connection.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO urls (name, created_at) "
