@@ -1,12 +1,5 @@
 from psycopg2.extras import NamedTupleCursor
-from dotenv import load_dotenv
 import psycopg2
-import datetime
-
-
-load_dotenv()
-
-DATE = datetime.datetime.now()
 
 
 def connect(app):
@@ -44,7 +37,7 @@ def get_url_from_db(id, connection):
     return data, checks
 
 
-def add_url_check_to_db(id, data, connection):
+def add_url_check_to_db(id, date, data, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("INSERT INTO url_checks "
                        "(url_id, status_code, h1, title, "
@@ -55,16 +48,16 @@ def add_url_check_to_db(id, data, connection):
                        {'url_id': id, 'status_code': data['status_code'],
                         'h1': data['h1'], 'title': data['title'],
                         'description': data['description'],
-                        'created_at': DATE})
+                        'created_at': date})
         connection.commit()
 
 
-def add_url_to_db(url, connection):
+def add_url_to_db(url, date, connection):
     with connection.cursor() as cursor:
         try:
             cursor.execute("INSERT INTO urls (name, created_at) "
                            "VALUES (%(name)s, %(created_at)s);",
-                           {'name': url, 'created_at': DATE})
+                           {'name': url, 'created_at': date})
             connection.commit()
             is_added = True
 

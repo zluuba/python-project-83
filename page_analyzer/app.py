@@ -9,6 +9,7 @@ from flask import (
     flash, get_flashed_messages, url_for, abort
 )
 from dotenv import load_dotenv
+import datetime
 import os
 
 
@@ -22,6 +23,8 @@ app.config.update(
     SECRET_KEY=SECRET_KEY,
     DATABASE_URL=DATABASE_URL
 )
+
+DATE = datetime.datetime.now()
 
 
 @app.route('/')
@@ -53,7 +56,7 @@ def add_url():
 
     url = get_normalized_url(url)
     conn = connect(app)
-    is_added, id = add_url_to_db(url, conn)
+    is_added, id = add_url_to_db(url, DATE, conn)
     if is_added:
         flash('Страница успешно добавлена', 'success')
     else:
@@ -85,7 +88,7 @@ def check(id):
     response = get_response(url)
     if response:
         data = get_parse_data(response)
-        add_url_check_to_db(id, data, conn)
+        add_url_check_to_db(id, DATE, data, conn)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
@@ -100,8 +103,8 @@ def page_not_found(error):
     ), 404
 
 
-@app.errorhandler(500)
-def internal_server_error():
+@app.errorhandler(Exception)
+def internal_server_error(error):
     return render_template(
         'internal_server_error.html'
     ), 500
