@@ -17,7 +17,11 @@ load_dotenv()
 app = Flask(__name__)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
-app.config.update(SECRET_KEY=SECRET_KEY)
+DATABASE_URL = os.getenv('DATABASE_URL')
+app.config.update(
+    SECRET_KEY=SECRET_KEY,
+    DATABASE_URL=DATABASE_URL
+)
 
 
 @app.route('/')
