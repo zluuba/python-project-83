@@ -24,11 +24,19 @@ def correct_urls():
 
 
 @pytest.fixture
-def correct_urls_short():
+def normalized_urls():
     url1 = 'https://www.google.com'
     url2 = 'https://correct.rl.com'
     url3 = 'http://correct-url.org'
     return url1, url2, url3
+
+
+@pytest.fixture
+def urls_parts():
+    parts1 = ('https', 'www.google.com')
+    parts2 = ('https', 'correct.rl.com')
+    parts3 = ('http', 'correct-url.org')
+    return parts1, parts2, parts3
 
 
 @pytest.fixture

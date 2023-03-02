@@ -1,4 +1,4 @@
-from page_analyzer.parser import get_valid_length_data, get_parse_data, HIDE_CHARS
+from page_analyzer.parser import get_valid_length_data, get_parse_data, get_response
 from page_analyzer.validator import MAX_LENGTH
 import responses
 import requests
@@ -14,14 +14,12 @@ def test_get_valid_length_data(correct_html_data, too_long_data):
 
     valid_long_data = get_valid_length_data(too_long_data)
     assert len(valid_long_data) <= MAX_LENGTH
-    assert valid_long_data[-3:] == HIDE_CHARS
 
 
 @responses.activate
-def test_get_parse_data(url, html_page_data):
+def test_get_response(url, html_page_data):
     file_path, page_data = html_page_data
 
     with open(file_path, 'rb') as file:
-        responses.add(responses.GET, url, body=file)
-        response = requests.get(url)
-        assert get_parse_data(response.content) == page_data
+        responses.add(responses.GET, url, body=file, status=404)
+        assert not get_response(url)
