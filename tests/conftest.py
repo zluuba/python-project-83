@@ -80,10 +80,11 @@ def too_long_data():
 @pytest.fixture
 def html_page_data():
     file_path = get_fixture_path('html_page.html')
+    status_code = 200
     h1 = 'Some header'
     title = 'Some title'
     description = 'Some description'
-    return file_path, dict(h1=h1, title=title, description=description)
+    return file_path, dict(h1=h1, title=title, description=description, status_code=status_code)
 
 
 @pytest.fixture
