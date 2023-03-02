@@ -5,10 +5,11 @@ import os
 
 
 DATE = datetime.datetime.now()
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 def connect():
-    connection = psycopg2.connect(os.getenv('DATABASE_URL'))
+    connection = psycopg2.connect(DATABASE_URL)
     return connection
 
 
