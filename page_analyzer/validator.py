@@ -26,7 +26,7 @@ def get_normalized_url(url):
     return f'{scheme}://{netloc}'
 
 
-def validate(url):
+def get_validation_errors(url):
     scheme, netloc = get_url_parts(url)
     valid_netloc = re.match(r"[a-zA-Z-]+\.[a-zA-Z]+", netloc)
 

@@ -1,4 +1,4 @@
-from page_analyzer.validator import validate, get_normalized_url
+from page_analyzer.validator import get_validation_errors, get_normalized_url
 from page_analyzer.parser import get_response, get_parse_data
 from page_analyzer.database import (
     add_url_to_db, get_urls_from_db, get_data_from_id,
@@ -43,7 +43,7 @@ def urls_list():
 @app.post('/urls')
 def add_url():
     url = request.form.get('url')
-    errors = validate(url)
+    errors = get_validation_errors(url)
     if errors:
         return render_template(
             'index.html',
