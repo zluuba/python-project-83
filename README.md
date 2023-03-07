@@ -6,7 +6,7 @@
 
 [//]: # ([![Test Coverage]&#40;https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/test_coverage&#41;]&#40;https://codeclimate.com/github/zluuba/python-project-83/test_coverage&#41;)
 
-[Link on Railway](https://page-analyzer-production-6bea.up.railway.app/)
+[//]: # ([Link on Railway]&#40;https://page-analyzer-production-6bea.up.railway.app/&#41;)
 
 Page Analyzer is a site that analyses specified pages for SEO-suitability (like [PageSpeed Insights](https://pagespeed.web.dev/)). <br>
 **This is a study project**, so it's not hosted (or hosted on Railway, if you see link above), but you can use it by setting up a few things which will be described below.
@@ -29,7 +29,7 @@ pip install --user git+https://github.com/zluuba/page-analyzer.git
 
 Install dependencies:
 ```ch
-cd page-analyzer                # don't forget cd to downloaded package dir
+cd page-analyzer                    # don't forget cd to downloaded package dir
 make install
 ```
 
@@ -69,12 +69,12 @@ make dev
 
 ### Demos
 
-#### Package setup:
+#### Package setup
 
 https://user-images.githubusercontent.com/87614163/220867550-2d8e1f02-fc26-41b0-9406-3787a6632780.mp4
 
 
-#### Usage:
+#### Usage
 
 https://user-images.githubusercontent.com/87614163/220869914-21c3617d-ef11-40eb-8cb3-842d5c057114.mp4
 
