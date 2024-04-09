@@ -5,7 +5,9 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/bc7724c1971a7f520682/maintainability)](https://codeclimate.com/github/zluuba/python-project-83/maintainability)
 
 Page Analyzer is a site that analyses specified pages for SEO-suitability (like [PageSpeed Insights](https://pagespeed.web.dev/)). <br>
-**This is a study project**, so it's not hosted, but you can use it by setting up a few things which will be described below.
+It's [hosted on my website](https://page-analyzer.zluuba.art/).
+To run the app locally, check the description below.
+
 
 ### Requirements
 
