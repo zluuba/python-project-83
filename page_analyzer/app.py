@@ -24,11 +24,6 @@ app.config.update(
     DATABASE_URL=DATABASE_URL
 )
 
-TEST_MODE = os.getenv('TEST_MODE')
-
-if not TEST_MODE:
-    init_db(connect(app))
-
 
 @app.route('/')
 def main_page():
@@ -118,3 +113,12 @@ def internal_server_error(error):
     return render_template(
         'internal_server_error.html'
     ), 500
+
+
+if __name__ == "__main__":
+    init_db(connect(app))
+
+    # TEST_MODE = os.getenv('TEST_MODE')
+
+    # if not TEST_MODE:
+    #     init_db(connect(app))
