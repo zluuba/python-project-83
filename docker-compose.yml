@@ -1,0 +1,26 @@
+version: '2.2'
+
+services:
+  pa_db:
+    image: postgres:latest
+    container_name: pa_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pa_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  pa_web:
+    build: .
+    ports:
+      - "5040:8000"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@pa_db:5432/pa_db
+      - SECRET_KEY=SecretKey
+    depends_on:
+      - pa_db
+
+volumes:
+  db-data:
