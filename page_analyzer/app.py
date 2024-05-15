@@ -2,7 +2,7 @@ from page_analyzer.validator import get_validation_errors, get_normalized_url
 from page_analyzer.parser import get_response, get_parse_data
 from page_analyzer.database import (
     add_url_to_db, get_urls_from_db, get_data_from_id,
-    get_url_from_db, add_url_check_to_db, connect
+    get_url_from_db, add_url_check_to_db, connect, init_db,
 )
 from flask import (
     Flask, render_template, request, redirect,
@@ -24,7 +24,7 @@ app.config.update(
     DATABASE_URL=DATABASE_URL
 )
 
-DATE = datetime.datetime.now()
+init_db(connect(app))
 
 
 @app.route('/')
@@ -48,6 +48,7 @@ def urls_list():
 def add_url():
     url = request.form.get('url')
     errors = get_validation_errors(url)
+
     if errors:
         return render_template(
             'index.html',
@@ -56,7 +57,10 @@ def add_url():
 
     url = get_normalized_url(url)
     conn = connect(app)
-    is_added, id = add_url_to_db(url, DATE, conn)
+    date = datetime.datetime.now()
+
+    is_added, id = add_url_to_db(url, date, conn)
+
     if is_added:
         flash('Страница успешно добавлена', 'success')
     else:
@@ -86,9 +90,12 @@ def check(id):
     conn = connect(app)
     url = get_data_from_id(id, conn).name
     response = get_response(url)
+
     if response:
         data = get_parse_data(response)
-        add_url_check_to_db(id, DATE, data, conn)
+        date = datetime.datetime.now()
+
+        add_url_check_to_db(id, date, data, conn)
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')

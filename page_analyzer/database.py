@@ -7,6 +7,30 @@ def connect(app):
     return psycopg2.connect(db_url)
 
 
+def init_db(connection):
+    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+        cursor.execute(
+            '''
+            CREATE TABLE IF NOT EXISTS urls (
+                id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                name VARCHAR(255) UNIQUE,
+                created_at TIMESTAMP NOT NULL
+            );
+            
+            CREATE TABLE IF NOT EXISTS url_checks (
+                id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                url_id bigint REFERENCES urls (id),
+                status_code integer,
+                h1 VARCHAR(255),
+                title VARCHAR(255),
+                description VARCHAR(255),
+                created_at TIMESTAMP NOT NULL
+            );
+            '''
+        )
+        connection.commit()
+
+
 def get_data_from_id(id, connection):
     with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
         cursor.execute("SELECT * FROM urls WHERE id = %s;", (id,))
