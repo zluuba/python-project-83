@@ -16,7 +16,7 @@ def init_db(connection):
                 name VARCHAR(255) UNIQUE,
                 created_at TIMESTAMP NOT NULL
             );
-            
+
             CREATE TABLE IF NOT EXISTS url_checks (
                 id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 url_id bigint REFERENCES urls (id),
