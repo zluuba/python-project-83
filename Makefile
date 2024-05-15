@@ -18,6 +18,4 @@ test-coverage:
 	poetry run pytest --cov=page_analyzer --cov-report xml
 
 little-cheat:
-	sudo apt install postgresql
-	createdb mydb
-	psql mydb < database.sql
+	[ -f .env ] && echo "TEST_MODE=True" >> .env || echo "TEST_MODE=True" > .env

@@ -8,7 +8,7 @@ def connect(app):
 
 
 def init_db(connection):
-    with connection.cursor(cursor_factory=NamedTupleCursor) as cursor:
+    with connection.cursor() as cursor:
         cursor.execute(
             '''
             CREATE TABLE IF NOT EXISTS urls (
