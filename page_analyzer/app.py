@@ -2,7 +2,7 @@ from page_analyzer.validator import get_validation_errors, get_normalized_url
 from page_analyzer.parser import get_response, get_parse_data
 from page_analyzer.database import (
     add_url_to_db, get_urls_from_db, get_data_from_id,
-    get_url_from_db, add_url_check_to_db, connect, init_db,
+    get_url_from_db, add_url_check_to_db, connect,
 )
 from flask import (
     Flask, render_template, request, redirect,
@@ -113,12 +113,3 @@ def internal_server_error(error):
     return render_template(
         'internal_server_error.html'
     ), 500
-
-
-if __name__ == "__main__":
-    init_db(connect(app))
-
-    # TEST_MODE = os.getenv('TEST_MODE')
-
-    # if not TEST_MODE:
-    #     init_db(connect(app))
