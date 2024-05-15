@@ -18,4 +18,6 @@ test-coverage:
 	poetry run pytest --cov=page_analyzer --cov-report xml
 
 little-cheat:
-	sudo ln -s /tmp/.s.PGSQL.5432 /var/run/postgresql/.s.PGSQL.5432
+	sudo apt install postgresql
+	createdb mydb
+	psql mydb < database.sql
