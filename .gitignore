@@ -1,8 +1,15 @@
-.venv/
+# PyCharm, MacOS files
 .idea/
-dist/
+.DS_Store
 
+# local environment
+.venv/
 .env
 
+# test coverage files
 .coverage
 coverage.xml
+
+# tests cache
+.pytest_cache/
+__pycache__
